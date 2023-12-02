@@ -1,4 +1,4 @@
-import { SafeAreaView, StyleSheet, Text, Touchable, TouchableOpacity, View } from 'react-native'
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import AudioRecorderPlayer from 'react-native-audio-recorder-player'
 import Icon from "react-native-vector-icons/FontAwesome5"
@@ -14,19 +14,20 @@ const App = () => {
   const [Playtime, setPlayTime] = useState(0);
   const [duration, setDuration] = useState('00:00');
 
-  const [isPlaying, setIsplaying] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
 
 
+
   useEffect(() => {
-    // kayıt  esnasında dinleme yapıyor 
+    // kayıt esnasında dinleme yapıyor 
     const recordBackListener = (e) => {
       setRecordSecs(e.currentPosition);
       setRecordTime(audioRecorderPlayer.mmssss(Math.floor(e.currentPosition)));
     };
     // oynatma esnasında dinleme yapıyor 
     const playBackListener = (e) => {
-      if (e.currentPosition = e.duration) {
+      if (e.currentPosition === e.duration) {
         audioRecorderPlayer.stopPlayer()
       }
       setCurrentPositionSec(e.currentPosition);
@@ -55,11 +56,8 @@ const App = () => {
   }
 
   async function playRecord() {
-
     try {
-
-      console.log('onStartPlay');
-      setIsplaying(true)
+      setIsPlaying(true)
       await audioRecorderPlayer.stopPlayer();  // Player'ı durdur
       const msg = await audioRecorderPlayer.startPlayer();
       console.log("güncelleme", msg);
@@ -73,21 +71,20 @@ const App = () => {
 
   const onStopPlay = async () => {
     setIsRecording(false)
+    setIsPlaying(false)
     console.log('onStopPlay');
     await audioRecorderPlayer.stopPlayer();
   };
 
   const onPausePlay = async () => {
-    setIsplaying(false)
+    setIsPlaying(false)
     await audioRecorderPlayer.pausePlayer();
   };
 
   const onResumePlay = async () => {
-    setIsplaying(true)
-
+    setIsPlaying(true)
     await audioRecorderPlayer.resumePlayer()
   };
-
 
   async function onStart() {
     setIsRecording(true)
@@ -99,11 +96,12 @@ const App = () => {
     console.log(result)
   }
 
-
   return (
     <SafeAreaView style={styles.container}>
-      <Text>{recordSecs}</Text>
-      <Text>{recordTime}</Text>
+      <Text >{recordSecs}</Text>
+      <Text style={{ color: "white" }}>{recordTime}</Text>
+      {isRecording ? <Text style={{ color: "white" }}>recording</Text> : null}
+
       <View style={styles.buttons}>
         {!isRecording ? <TouchableOpacity onPress={onStart}>
           <Icon name={"microphone"} color={"blue"} size={55}></Icon>
@@ -112,31 +110,30 @@ const App = () => {
             <Icon name={"stop-circle"} color={"blue"} size={55}></Icon>
           </TouchableOpacity>}
       </View>
-      <View style={styles.buttons}>
-        {!isRecording ? (
-          isPlaying ? (
+
+        {!isPlaying ? (
+          <View style={styles.buttons}>
             <TouchableOpacity onPress={onStopPlay}>
               <Text style={styles.buttonText}>Stop</Text>
             </TouchableOpacity>
-          ) : (
-            <TouchableOpacity onPress={playRecord}>
-              <Text style={styles.buttonText}>Play</Text>
-            </TouchableOpacity>
-          )
-        ) : null}
-        {isRecording && (
-          <React.Fragment>
             <TouchableOpacity onPress={onPausePlay}>
-              <Text style={styles.buttonText}>Pause</Text>
+              <Text style={styles.buttonText}>Pause </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={onResumePlay}>
-              <Text style={styles.buttonText}>Resume</Text>
+              <Text style={styles.buttonText}>Resume </Text>
             </TouchableOpacity>
-          </React.Fragment>
-        )}
+          </View>
 
-      </View>
+        ) :
+          (<View style={styles.buttons}>
+            <TouchableOpacity onPress={playRecord}>
+              <Text style={styles.buttonText}>Play</Text>
+              <Text style={{ color: "white" }}>{duration}</Text>
+            </TouchableOpacity>
+          </View>)
+        }
     </SafeAreaView>
+
   )
 }
 
